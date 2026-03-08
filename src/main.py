@@ -62,46 +62,67 @@ def run_capture():
         return
 
     cam_input = input("카메라 번호를 입력하세요 (예: 0): ").strip()
-
     if not cam_input.isdigit():
         print("[ERROR] 숫자만 입력해주세요.")
         return
 
-    camera_index = int(cam_input)
-
     print("\n[INFO] 캡처 세션을 시작합니다.")
-    print("[INFO] 조작 방법:")
-    print("  - ESC : 영상 종료")
-    print("  - s   : 현재 프레임 저장")
-    print("  - q   : 터미널에서 q 입력 후 Enter 로 종료")
-    print("-" * 50)
-
     try:
         run_capture_session(
-            camera_index=camera_index,
+            camera_index=int(cam_input),
             save_dir=str(PROJECT_ROOT / "captures" / "raw"),
         )
     except Exception as e:
         print(f"[ERROR] 캡처 실행 중 예외 발생: {e}")
 
 
+def run_auto_bot():
+    try:
+        from auto_run import start_auto_reset_session
+    except Exception as e:
+        print(f"[ERROR] auto_run 모듈 import 실패: {e}")
+        return
+        
+    print("\n[INFO] 자동 리셋 봇 설정을 시작합니다.")
+    
+    # 카메라 설정
+    cam_input = input("사용할 카메라 번호를 입력하세요 (예: 0): ").strip()
+    if not cam_input.isdigit():
+        print("[ERROR] 숫자로 입력해주세요.")
+        return
+    
+    try:
+        start_auto_reset_session(
+            camera_index=int(cam_input)
+        )
+    except Exception as e:
+        print(f"[ERROR] 봇 실행 중 예외 발생: {e}")
+
+
 def main():
     print_header()
 
     while True:
-        print_menu()
+        print("\n메뉴를 선택하세요.")
+        print("1. [핵심] 자동 리셋 봇 실행 (Mock 컨트롤러)")
+        print("2. 단순 캡처 실행 (프레임 확인 및 수집용)")
+        print("3. 사용 가능한 카메라 찾기")
+        print("4. 종료")
+        print("-" * 50)
+        
         choice = input("입력 > ").strip()
 
         if choice == "1":
-            run_capture()
+            run_auto_bot()
         elif choice == "2":
-            run_find_cameras()
+            run_capture()
         elif choice == "3":
+            run_find_cameras()
+        elif choice == "4":
             print("프로그램을 종료합니다.")
             sys.exit(0)
         else:
             print("[WARN] 올바른 메뉴 번호를 입력해주세요.")
-
 
 if __name__ == "__main__":
     main()

@@ -3,8 +3,10 @@ import numpy as np
 # TODO: 실제 캡처 화면(1280x720)에 맞춰 좌표를 수정해야 합니다.
 # (x, y, width, height) 형식
 ROI_CONFIG = {
-    "pokemon_summary":   (200, 350, 300, 300),   # 내 포켓몬 위치 (임시 지정)
-    "text_box":     (100, 550, 1080, 150),  # 하단 텍스트 박스 위치 (임시 지정)
+    "nickname_state" : (726, 529, 219, 74), # 닉네임 작성 여부 확인
+    "pokemon_summary":   (122, 5, 493, 68),   # 포켓몬 정보창 확인 좌표
+    "shiny_check" : (521, 145, 109, 88), # 포켓몬 색깔 확인 좌표
+    "dialog_box": (173, 519, 783, 144), # 오키드 박사 (또는 라이벌) 대화창 확인용 좌표 (좌표 획득 필요)
 }
 
 def get_roi_slice(frame: np.ndarray, roi_name: str) -> np.ndarray:

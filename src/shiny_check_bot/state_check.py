@@ -3,27 +3,19 @@ import numpy as np
 from pathlib import Path
 
 # 템플릿 이미지가 저장될 기본 경로
-TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "templates"
+TEMPLATE_DIR = Path(__file__).resolve().parent.parent.parent / "templates" / "scen"
 
 class GameState:
     UNKNOWN = "UNKNOWN"
-    OPENING = "OPENING"
-    TITLE = "TITLE"
-    CONTINUE_SCREEN = "CONTINUE_SCREEN"
-    CHOOSE_STARTER = "CHOOSE_STARTER"
-    BULBASAUR_YES = "BULBASAUR_YES"
     NICKNAME_PROMPT = "NICKNAME_PROMPT"
+    OAK_DIALOGUE = "OAK_DIALOGUE"
     POKEMON_SUMMARY = "POKEMON_SUMMARY"
 
 # 템플릿 파일명과 GameState를 매핑
 TEMPLATE_MAP = {
-    "00_opening.png": GameState.OPENING,
-    "01_title.png": GameState.TITLE,
-    "02_continue.png": GameState.CONTINUE_SCREEN,
-    "03_choose.png": GameState.CHOOSE_STARTER,
-    "04_bulbasaur_yes.png": GameState.BULBASAUR_YES,
-    "05_nickname.png": GameState.NICKNAME_PROMPT,
-    "06_pokemon_summary.png": GameState.POKEMON_SUMMARY,
+    "00_nickname.png": GameState.NICKNAME_PROMPT,
+    "01_pokemon_summary.png": GameState.POKEMON_SUMMARY,
+    "02_green_dialog_box.png": GameState.OAK_DIALOGUE,
 }
 
 def check_template_match(frame: np.ndarray, template_path: Path, threshold: float = 0.8) -> bool:
@@ -55,14 +47,40 @@ def check_template_match(frame: np.ndarray, template_path: Path, threshold: floa
     
     return max_val >= threshold
 
+from shiny_check_bot.roi import get_roi_slice
+
 def get_current_state(frame: np.ndarray) -> str:
     """
     현재 프레임을 분석하여 게임의 주요 상태를 판단합니다.
     TEMPLATE_MAP에 정의된 템플릿들을 순회하며 가장 먼저 매칭되는 상태를 반환합니다.
     """
-    for template_name, state in TEMPLATE_MAP.items():
-        template_path = TEMPLATE_DIR / template_name
-        if check_template_match(frame, template_path, threshold=0.85):
-            return state
+    # [최적화] 전체 화면을 탐색하면 렉이 매우 심하므로, 각 상태별로 지정된 ROI(관심 구역)만 잘라서 검사합니다.
+    
+    # 1. 포켓몬 스테이터스 창 확인
+    try:
+        summary_roi = get_roi_slice(frame, "pokemon_summary")
+        summary_template_path = TEMPLATE_DIR / "01_pokemon_summary.png"
+        if check_template_match(summary_roi, summary_template_path, threshold=0.85):
+            return GameState.POKEMON_SUMMARY
+    except Exception:
+        pass 
+        
+    # 2. 닉네임 프롬프트 창 확인
+    try:
+        nickname_roi = get_roi_slice(frame, "nickname_state")
+        nickname_template_path = TEMPLATE_DIR / "00_nickname.png"
+        if check_template_match(nickname_roi, nickname_template_path, threshold=0.85):
+            return GameState.NICKNAME_PROMPT
+    except Exception:
+        pass
+        
+    # 3. 오키드 박사 (또는 라이벌) 대화창 확인
+    try:
+        dialog_roi = get_roi_slice(frame, "dialog_box")
+        dialog_template_path = TEMPLATE_DIR / "02_green_dialog_box.png"
+        if check_template_match(dialog_roi, dialog_template_path, threshold=0.85):
+            return GameState.OAK_DIALOGUE
+    except Exception:
+        pass
             
     return GameState.UNKNOWN
