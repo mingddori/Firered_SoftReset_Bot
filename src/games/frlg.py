@@ -1,5 +1,6 @@
 import time
 import cv2
+import numpy as np
 from .base_game import BaseGamePreset
 from shiny_check_bot.shiny_detector import is_shiny
 

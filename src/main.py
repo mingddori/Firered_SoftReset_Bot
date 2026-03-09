@@ -61,10 +61,10 @@ def select_game_preset():
     from games.bdsp import BDSP_Preset
     
     print("\n[INFO] 지원하는 게임 버전을 선택하세요.")
-    print("1. FireRed / LeafGreen (3세대 리메이크)")
-    print("2. HeartGold / SoulSilver (4세대 리메이크)")
-    print("3. OmegaRuby / AlphaSapphire (6세대 리메이크)")
-    print("4. BrilliantDiamond / ShiningPearl (8세대 리메이크)")
+    print("1. FireRed / LeafGreen (1세대 리메이크 / 3세대 환경)")
+    print("2. HeartGold / SoulSilver (2세대 리메이크 / 4세대 환경)")
+    print("3. OmegaRuby / AlphaSapphire (3세대 리메이크 / 6세대 환경)")
+    print("4. BrilliantDiamond / ShiningPearl (4세대 리메이크 / 8세대 환경)")
     
     choice = input("선택 > ").strip()
     if choice == "1":
@@ -86,8 +86,10 @@ def run_capture():
         print(f"[ERROR] capture_run 모듈 import 실패: {e}")
         return
 
+    print("\n" + "=" * 50)
     game_preset = select_game_preset()
     
+    print("\n" + "=" * 50)
     cam_input = input("카메라 번호를 입력하세요 (예: 0): ").strip()
     if not cam_input.isdigit():
         print("[ERROR] 숫자만 입력해주세요.")
@@ -111,11 +113,13 @@ def run_auto_bot():
         print(f"[ERROR] auto_run 모듈 import 실패: {e}")
         return
         
+    print("\n" + "=" * 50)
     print("\n[INFO] 자동 리셋 봇 설정을 시작합니다.")
     
     game_preset = select_game_preset()
     
     # 카메라 설정
+    print("\n" + "=" * 50)
     cam_input = input("사용할 카메라 번호를 입력하세요 (예: 0): ").strip()
     if not cam_input.isdigit():
         print("[ERROR] 숫자로 입력해주세요.")
